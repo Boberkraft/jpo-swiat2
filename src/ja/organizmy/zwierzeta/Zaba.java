@@ -31,18 +31,15 @@ public class Zaba extends Zwierze {
 
     @Override
     public void kolizja(Zwierze wchodzacy) {
-        Pozycja wolnaPozycja = new Pozycja(0, 0);
-        boolean znalezionoWolneMiejsce = swiat.znajdzWolneMiejsceObok(1,
-                this.pozycja,
-                wolnaPozycja);
-        if (wchodzacy.getZnak() != getZnak() && znalezionoWolneMiejsce) {
+        Pozycja wolnaPozycja = swiat.znajdzWolneMiejsceObok(1, this.pozycja);
+        if (wchodzacy.getZnak() == getZnak() || wolnaPozycja == null) {
+            super.kolizja(wchodzacy);
+        } else {
             Vector<String> komunikat = new Vector<>();
             komunikat.add(getZnak());
             komunikat.add("\uD83D\uDCA8\n");
             Ekran.wstawKomunikat(komunikat);
             swiat.idz(this, wolnaPozycja);
-        } else {
-            super.kolizja(wchodzacy);
-        } ;
+        }
     }
 }

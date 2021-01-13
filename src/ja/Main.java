@@ -3,8 +3,6 @@ package ja;
 import ja.organizmy.zwierzeta.*;
 import ja.organizmy.rosliny.*;
 
-import java.util.function.Consumer;
-
 public class Main {
     public static Swiat swiat;
 
@@ -12,9 +10,11 @@ public class Main {
         swiat.dodajOrganizm(co);
         swiat.idz(co, new Pozycja(x, y));
     }
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, Exception {
         swiat = new Swiat();
 
+        Ekran.initialize(swiat);
+//
         dodaj(new Wilk(), 14, 1);
         dodaj(new Wilk(), 13, 1);
         dodaj(new Wilk(), 2, 1);

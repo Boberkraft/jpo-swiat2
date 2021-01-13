@@ -39,7 +39,7 @@ public abstract class Zwierze extends Organizm {
                 swiat.idz(wchodzacy, getPozycja());
             } else {
                 komunikat.add(getZnak());
-                komunikat.add("\uD83D\uDEE1 ");
+                komunikat.add("\uD83D\uDEE1");
                 komunikat.add(wchodzacy.getZnak());
                 swiat.zabij(wchodzacy);
             }

@@ -37,6 +37,11 @@ public abstract class Organizm {
         return zyje;
     }
 
+    public boolean czyNieZyje() {
+        return !zyje;
+    }
+
+
     public void setZyje(boolean b) {
         this.zyje = b;
     }

@@ -7,21 +7,25 @@ import ja.organizmy.Zwierze;
 import java.util.*;
 
 public class Swiat {
+    public static final int ROZMIAR = 20;
+    private Random random;
     private int tura;
     private Vector<Organizm> organizmy;
 
     public Swiat() {
         this.tura = 1;
+        this.random = new Random();
         this.organizmy = new Vector<>();
     }
 
-    public void wykonajTure() {
+    public void wykonajTure() throws Exception {
         weryfikujCzyWszystkoGit();
         ustawKolejnoscWalk();
 
         int size = organizmy.size();
         for (int i = 0; i < size; i++) {
             Organizm organizm = organizmy.get(i);
+
             if (organizm.getZyje()) {
                 organizm.akcja();
             }
@@ -42,10 +46,13 @@ public class Swiat {
     }
 
     public void rysujSwiat() {
+        Ekran.wyczysc();
+
         for (Organizm organizm : organizmy) {
             organizm.rysowanie();
         }
-        Ekran.wyswietl();
+
+        Ekran.wyswietlKomunikaty();
     }
 
     public void idz(Organizm ruszajacySie, Pozycja pozycja) {
@@ -57,7 +64,6 @@ public class Swiat {
 
         if (stojacy == null) {
             ruszajacySie.setPozycja(pozycja);
-
         } else {
             stojacy.kolizja(ruszajacySie);
 
@@ -67,7 +73,11 @@ public class Swiat {
 
     public Organizm znajdz(Pozycja pozycja) {
         for (Organizm organizm : organizmy) {
-            if (organizm.getZyje() && organizm.getPozycja() == pozycja) {
+            if (organizm.getPozycja() == null) {
+               continue;
+            }
+
+            if (organizm.getZyje() && organizm.getPozycja().equals(pozycja)) {
                 return organizm;
             }
         }
@@ -91,7 +101,7 @@ public class Swiat {
         if (nowe != null) {
             Vector<String> komunikat = new Vector<>();
             komunikat.add(roslina.getZnak());
-            komunikat.add("\uD83D\uDCA6\n");
+            komunikat.add("\uD83D\uDCA6");
             Ekran.wstawKomunikat(komunikat);
         }
 
@@ -100,11 +110,9 @@ public class Swiat {
 
 
     public Organizm rozmnorz(Organizm organizm, int zasieg) {
-        Pozycja wolnaPozycja = new Pozycja(0, 0);
-        boolean znalezionoWolneMiejsce = znajdzWolneMiejsceObok(zasieg,
-                organizm.getPozycja(),
-                wolnaPozycja);
-        if (!znalezionoWolneMiejsce) {
+        Pozycja wolnaPozycja = znajdzWolneMiejsceObok(zasieg,
+                organizm.getPozycja());
+        if (wolnaPozycja == null) {
             return null;
         }
 
@@ -114,31 +122,34 @@ public class Swiat {
         return dziecko;
     }
 
-    public boolean znajdzWolneMiejsceObok(int zasieg, Pozycja pozycja, Pozycja wybranaPozycja) {
+    public Pozycja znajdzWolneMiejsceObok(int zasieg, Pozycja pozycja) {
         Vector<Integer> proby = new Vector<>();
 
-        Random rand = new Random();
         for (int iloscProb = 0; iloscProb < zasieg; iloscProb++) {
-            int wylosowanyKierunek = rand.nextInt(zasieg * 2 + 1) * (zasieg * 2 + 1);
-
+            int wylosowanyKierunek = random.nextInt((zasieg * 2 + 1) * (zasieg * 2 + 1));
+            // 0 1 2
+            // 3 4 5
+            // 6 7 8
             if (proby.contains(wylosowanyKierunek)) {
                 continue;
             }
             proby.add(wylosowanyKierunek);
 
-            int x = (wylosowanyKierunek / ((zasieg + 1) * 2) - zasieg / 2);
-            int y = (wylosowanyKierunek % ((zasieg + 1) * 2) - zasieg / 2);
-            wybranaPozycja = new Pozycja(pozycja.getRzad() + x, pozycja.getKolumna() + y);
+            int x = (wylosowanyKierunek / (int) ((zasieg + 1) * 2)) - zasieg;
+            int y = (wylosowanyKierunek % (int) ((zasieg + 1) * 2)) - zasieg;
+//            System.out.println(x);
+//            System.out.println(y);
+//            System.out.println();
+
+            Pozycja wybranaPozycja = new Pozycja(pozycja.getRzad() + x, pozycja.getKolumna() + y);
 
             Organizm zajety = znajdz(wybranaPozycja);
 
-            if (zajety != null) {
-                continue;
-            } else {
-                return true; // OK!
+            if (zajety == null) {
+                return wybranaPozycja;
             }
         }
-        return false;
+        return null;
     }
 
 
@@ -152,10 +163,10 @@ public class Swiat {
     }
 
     private void usunMartweOrganizmy() {
-        organizmy.removeIf(Organizm::getZyje);
+        organizmy.removeIf(Organizm::czyNieZyje);
     }
 
-    private void weryfikujCzyWszystkoGit() {
+    private void weryfikujCzyWszystkoGit() throws Exception {
         int ilosc_zyjacych = 0;
 
         for (Organizm organizm : organizmy) {
@@ -165,7 +176,7 @@ public class Swiat {
         }
 
         if (0 == ilosc_zyjacych || ilosc_zyjacych > 400) {
-//            throw "Ilosc Zyjacych zwierzat sie nie zgadza!";
+            throw new Exception("Rzyje " + ilosc_zyjacych + ", czyli za dużo...");
         }
     }
 
